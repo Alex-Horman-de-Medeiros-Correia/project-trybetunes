@@ -12,6 +12,9 @@ class Routes extends React.Component {
   render() {
     return (
       <Switch>
+        <Route exact path="/profile/edit" component={ ProfileEdit } />
+
+        <Route exact path="/" component={ Login } />
 
         <Route path="/search" component={ Search } />
 
@@ -21,11 +24,7 @@ class Routes extends React.Component {
 
         <Route path="/profile" component={ Profile } />
 
-        <Route path="/profile/edit" component={ ProfileEdit } />
-
-        <Route path="*" component={ NotFound } />
-
-        <Route exact path="/" component={ Login } />
+        <Route component={ NotFound } />
 
       </Switch>
     );
