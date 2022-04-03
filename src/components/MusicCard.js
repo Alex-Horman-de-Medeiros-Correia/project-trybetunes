@@ -9,30 +9,62 @@ class MusicCard extends React.Component {
     super();
 
     this.state = {
-      checando: false,
+      musicasFvoritas: [],
       carregando: false,
     };
   }
 
-  checandoFav = (favorites, trackId) => {
-    const checkFav = favorites.some((element) => element.trackId === trackId);
-    return checkFav;
+  componentDidMount() {
+    this.adcionaFavSongs();
   }
 
-  adcionaFavSongs = async (song) => {
+  adcionaFavSongs = async () => {
+    this.setState({
+      musicasFvoritas: await favoriteSongsAPI
+        .getFavoriteSongs(),
+    });
+  }
+
+  check = async (song) => {
+    const { musicasFvoritas } = this.state;
+
+    if (musicasFvoritas.length > 0) {
+      const fav = musicasFvoritas
+        .some((elementOne) => elementOne.trackId === song.trackId);
+      return fav;
+    }
+    return false;
+  }
+
+  addSongs = ({ target }, element) => {
+    const { checked } = target;
+    const { musicasFvoritas } = this.state;
+
     this.setState({
       carregando: true,
+    }, async () => {
+      if (checked) {
+        await favoriteSongsAPI.addSong(element);
+        this.setState(({
+          musicasFvoritas: [...musicasFvoritas, element],
+        }));
+      } else {
+        await favoriteSongsAPI.removeSong(element);
+        this.setState({
+          musicasFvoritas: musicasFvoritas
+            .filter((elementFav) => elementFav.trackId !== element.trackId),
+        });
+      }
+      this.setState({
+        carregando: false,
+      });
     });
-    await favoriteSongsAPI.addSong(song);
-    this.setState({
-      carregando: false,
-      checando: true,
-    });
-  };
+  }
 
   render() {
-    const { trackName, favoriteList, previewUrl, trackId, song } = this.props;
-    const { carregando, checando } = this.state;
+    const { trackName, previewUrl,
+      trackId, song, adcionaFavSongs, element, tela } = this.props;
+    const { carregando, musicasFvoritas } = this.state;
 
     return (
       <div>
@@ -57,9 +89,13 @@ class MusicCard extends React.Component {
               <input
                 id={ trackId }
                 type="checkbox"
-                checked={ this.checandoFav(favoriteList, trackId) || checando }
+                checked={ musicasFvoritas
+                  .some((elementOne) => elementOne.trackId === trackId) }
                 data-testid={ `checkbox-music-${trackId}` }
-                onChange={ () => this.adcionaFavSongs(song) }
+                /* onChange={ (event) => this.addSongs(event, song) } */
+                onChange={ tela === 'favorito'
+                  ? (event) => adcionaFavSongs(event, element)
+                  : (event) => this.addSongs(event, song) }
               />
             </label>
           </>
@@ -70,13 +106,18 @@ class MusicCard extends React.Component {
 }
 
 MusicCard.propTypes = {
-  favoriteList: propTypes.arrayOf(propTypes.object).isRequired,
+  adcionaFavSongs: propTypes.func.isRequired,
+  element: propTypes.shape({
+    artistName: propTypes.string,
+  }).isRequired,
+  tela: propTypes.string.isRequired,
   trackName: propTypes.string.isRequired,
   previewUrl: propTypes.string.isRequired,
   trackId: propTypes.number.isRequired,
   song: propTypes.shape({
     artistId: propTypes.number,
   }).isRequired,
+
 };
 
 export default MusicCard;
