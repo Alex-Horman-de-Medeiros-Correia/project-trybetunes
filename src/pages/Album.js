@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import getMusics from '../services/musicsAPI';
 import MusicCard from '../components/MusicCard';
+import Loading from './Loaging';
+
+const favoriteSongsAPI = require('../services/favoriteSongsAPI');
 
 class Album extends React.Component {
   constructor() {
@@ -12,11 +15,26 @@ class Album extends React.Component {
       artista: '',
       album: '',
       musicas: [],
+      favoritas: [],
+      carregando: false,
     };
   }
 
   componentDidMount() {
     this.allMusics();
+    this.favSongs();
+  }
+
+  favSongs = async () => {
+    this.setState({
+      carregando: true,
+    });
+    const favSongs1 = await favoriteSongsAPI.getFavoriteSongs();
+
+    this.setState({
+      carregando: false,
+      favoritas: [...favSongs1],
+    });
   }
 
   allMusics = async () => {
@@ -34,32 +52,37 @@ class Album extends React.Component {
   }
 
   render() {
-    const { artista, album, musicas } = this.state;
+    const { artista, album, musicas, carregando, favoritas } = this.state;
 
     return (
       <div data-testid="page-album">
         <Header />
 
-        <h1 data-testid="artist-name">
-          {' '}
-          { `Veja os maiores Hits de ${artista}!` }
-          {' '}
-        </h1>
-        <h2 data-testid="album-name">
-          {' '}
-          { `Direto do Album: ${album}...` }
-          {' '}
-        </h2>
+        { carregando ? <Loading /> : (
+          <>
+            <h1 data-testid="artist-name">
+              {' '}
+              { `Veja os maiores Hits de ${artista}!` }
+              {' '}
+            </h1>
+            <h2 data-testid="album-name">
+              {' '}
+              { `Direto do Album: ${album}...` }
+              {' '}
+            </h2>
 
-        { musicas.map((element) => (
-          <MusicCard
-            key={ element.trackId }
-            trackName={ element.trackName }
-            previewUrl={ element.previewUrl }
-            trackId={ element.trackId }
-            song={ element }
-          />
-        ))}
+            { musicas.map((element) => (
+              <MusicCard
+                key={ element.trackId }
+                trackName={ element.trackName }
+                previewUrl={ element.previewUrl }
+                trackId={ element.trackId }
+                favoriteList={ favoritas }
+                song={ element }
+              />
+            ))}
+          </>
+        )}
       </div>
     );
   }

@@ -14,19 +14,24 @@ class MusicCard extends React.Component {
     };
   }
 
+  checandoFav = (favorites, trackId) => {
+    const checkFav = favorites.some((element) => element.trackId === trackId);
+    return checkFav;
+  }
+
   adcionaFavSongs = async (song) => {
     this.setState({
       carregando: true,
-      checando: true,
     });
     await favoriteSongsAPI.addSong(song);
     this.setState({
       carregando: false,
+      checando: true,
     });
   };
 
   render() {
-    const { trackName, previewUrl, trackId, song } = this.props;
+    const { trackName, favoriteList, previewUrl, trackId, song } = this.props;
     const { carregando, checando } = this.state;
 
     return (
@@ -52,7 +57,7 @@ class MusicCard extends React.Component {
               <input
                 id={ trackId }
                 type="checkbox"
-                checked={ checando }
+                checked={ this.checandoFav(favoriteList, trackId) || checando }
                 data-testid={ `checkbox-music-${trackId}` }
                 onChange={ () => this.adcionaFavSongs(song) }
               />
@@ -65,6 +70,7 @@ class MusicCard extends React.Component {
 }
 
 MusicCard.propTypes = {
+  favoriteList: propTypes.arrayOf(propTypes.object).isRequired,
   trackName: propTypes.string.isRequired,
   previewUrl: propTypes.string.isRequired,
   trackId: propTypes.number.isRequired,
