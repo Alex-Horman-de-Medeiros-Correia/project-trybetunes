@@ -42,12 +42,12 @@ class Album extends React.Component {
 
         <h1 data-testid="artist-name">
           {' '}
-          { `${artista}` }
+          { `Veja os maiores Hits de ${artista}!` }
           {' '}
         </h1>
         <h2 data-testid="album-name">
           {' '}
-          { `${album}` }
+          { `Direto do Album: ${album}...` }
           {' '}
         </h2>
 
