@@ -40,7 +40,8 @@ class Login extends React.Component {
   }
 
   render() {
-    const { name, botaoDesabilitar, carregando, infoRecebida } = this.state;
+    const { name, botaoDesabilitar, carregando,
+      infoRecebida } = this.state;
 
     return (
       <div data-testid="page-login">
