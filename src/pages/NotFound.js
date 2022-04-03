@@ -4,7 +4,7 @@ class NotFound extends React.Component {
   render() {
     return (
       <div data-testid="page-not-found">
-          
+        <h1>Nada encontrado por aqui, Cowboy!</h1>
       </div>
     );
   }
